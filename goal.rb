@@ -1,8 +1,6 @@
 require 'hue'
 require 'parallel'
 
-HUE = 65535
-
 client = Hue::Client.new
 
 pid = fork do
@@ -21,22 +19,26 @@ Parallel.each(client.lights) do |light|
   saved_color_temperature = light.color_temperature
   saved_color_mode = light.color_mode
 
-  sleep 2
+  sleep 3
 
   # Switch to our brightness/hue
-  light.brightness = 0
-  light.hue = HUE
-  light.on = true
+  light.set_state({
+    :on => true,
+    :brightness => 255,
+    :hue => 65535,
+    :transitiontime => 10})
+
+  sleep 1
 
   27.times do |i|
     light.set_state({
-      :brightness => 255,
+      :brightness => 0,
       :transitiontime => 10})
 
     sleep 1
 
     light.set_state({
-      :brightness => 0,
+      :brightness => 255,
       :transitiontime => 10})
 
     sleep 1
