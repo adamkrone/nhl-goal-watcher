@@ -51,28 +51,39 @@ module NhlGoalWatcher
       request = Net::HTTP::Get.new(uri.request_uri)
       response = http.request(request)
 
+      parse_response(response)
+
+      sleep @timeout
+      poll_games
+    end
+
+    def parse_response(response)
       if response.code == "200"
         body = parse_jsonp(response.body)
         results = JSON.parse(body)
         games = results["games"]
 
-        games.each do |game|
-          if game['hta'] == @team || game['ata'] == @team
-            unless @game_type
-              assign_game_type(game)
-            end
+        check_games(games)
+      end
+    end
 
-            puts "Home Team: #{game['htcommon']}\t#{game['hts']}"
-            puts "Away Team: #{game['atcommon']}\t#{game['ats']}"
-            puts "Status: #{game['bs']}\n"
-
-            check_scores(game)
+    def check_games(games)
+      games.each do |game|
+        if game['hta'] == @team || game['ata'] == @team
+          unless @game_type
+            assign_game_type(game)
           end
+
+          show_game_status(game)
+          check_scores(game)
         end
       end
+    end
 
-      sleep @timeout
-      poll_games
+    def show_game_status(game)
+      puts "Home Team: #{game['htcommon']}\t#{game['hts']}"
+      puts "Away Team: #{game['atcommon']}\t#{game['ats']}"
+      puts "Status: #{game['bs']}\n"
     end
   end
 end
