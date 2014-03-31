@@ -10,10 +10,7 @@ module NhlGoalWatcher
     def score
       client = Hue::Client.new
 
-      pid = fork do
-        sleep 2
-        exec 'afplay', @mp3
-      end
+      play_mp3
 
       Parallel.each(client.lights) do |light|
         # Save current brightness/hue
@@ -28,40 +25,66 @@ module NhlGoalWatcher
 
         sleep 3
 
-        # Switch to our brightness/hue
+        setup_light(light)
+
+        sleep 1
+
+        flash_light(light)
+        revert_light(light,
+                     saved_state,
+                     saved_brightness,
+                     saved_hue,
+                     saved_saturation,
+                     saved_x,
+                     saved_y,
+                     saved_color_temperature,
+                     saved_color_mode)
+      end
+    end
+
+    def play_mp3
+      pid = fork do
+        sleep 2
+        exec 'afplay', @mp3
+      end
+    end
+
+    def setup_light(light)
         light.set_state({
           :on => true,
           :brightness => 255,
           :hue => 65535,
           :transitiontime => 10})
+    end
+
+    def flash_light(light)
+      27.times do |i|
+        light.set_state({
+          :brightness => 0,
+          :transitiontime => 10})
 
         sleep 1
 
-        27.times do |i|
-          light.set_state({
-            :brightness => 0,
-            :transitiontime => 10})
-
-          sleep 1
-
-          light.set_state({
-            :brightness => 255,
-            :transitiontime => 10})
-
-          sleep 1
-        end
-
-        # Revert brightness/hue
         light.set_state({
-          :on => saved_state,
-          :brightness => saved_brightness,
-          :hue => saved_hue,
-          :saturation => saved_saturation,
-          :x => saved_x,
-          :y => saved_y,
-          :color_temperature => saved_color_temperature,
-          :color_mode => saved_color_mode})
+          :brightness => 255,
+          :transitiontime => 10})
+
+        sleep 1
       end
+    end
+
+    def revert_light(light, saved_state, saved_brightness, saved_hue,
+                     saved_saturation, saved_x, saved_y,
+                     saved_color_temperature, saved_color_mode)
+      light.set_state({
+        :on => saved_state,
+        :brightness => saved_brightness,
+        :hue => saved_hue,
+        :saturation => saved_saturation,
+        :x => saved_x,
+        :y => saved_y,
+        :color_temperature => saved_color_temperature,
+        :color_mode => saved_color_mode})
     end
   end
 end
