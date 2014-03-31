@@ -23,6 +23,7 @@ module NhlGoalWatcher
         sleep 1
 
         flash_light(light)
+
         revert_light(light, saved_light_state)
       end
     end
