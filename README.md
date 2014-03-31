@@ -1,4 +1,4 @@
-# NhlGoalWatcher
+# NhlGoalWatcher [![Code Climate](https://codeclimate.com/github/adamkrone/nhl-goal-watcher.png)](https://codeclimate.com/github/adamkrone/nhl-goal-watcher)
 
 Watches NHL for goal score updates, and triggers events
 
