@@ -5,7 +5,7 @@ client = Hue::Client.new
 
 pid = fork do
   sleep 2
-  exec 'afplay', './goal-horn.mp3'
+  exec 'afplay', './hawks_goal.mp3'
 end
 
 Parallel.each(client.lights) do |light|
