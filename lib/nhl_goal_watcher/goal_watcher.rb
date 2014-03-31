@@ -37,9 +37,7 @@ module NhlGoalWatcher
 
       if @team_score && score > @team_score
         puts "GOOOOOOOOOAAAAAAAAAAAL!!!"
-        pid = fork do
-          exec 'ruby', './goal.rb'
-        end
+        @goal.score
       end
 
       @team_score = score
